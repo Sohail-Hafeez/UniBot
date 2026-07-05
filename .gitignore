@@ -1,0 +1,22 @@
+# Secrets — never commit
+.env
+.env.*
+*firebase-adminsdk*.json
+
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
+frontend/dist/
+
+# Generated / runtime data
+logs/
+backend/db/*.db
+
+# Ingestion pipeline data (regenerable via the pipeline scripts; not
+# needed at runtime — the deployed backend talks to Qdrant Cloud, not
+# these local files)
+data/

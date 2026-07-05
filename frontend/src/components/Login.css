@@ -1,0 +1,313 @@
+/* Instagram mobile-app dark theme: true black, no card border — content
+   sits directly on black, inputs are filled dark pills, and the sign-up
+   prompt is a bar pinned to the bottom edge of the screen. Scoped to its
+   own file/class prefix (ig-) so it never bleeds into index.css. */
+
+@keyframes ig-fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ig-spin {
+  to { transform: rotate(360deg); }
+}
+
+.ig-page {
+  min-height: 100vh;
+  overflow-y: auto;
+  background: #000000;
+  display: flex;
+  flex-direction: column;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.ig-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  position: relative;
+}
+
+.ig-box {
+  position: relative;
+  width: 100%;
+  max-width: 340px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #0a0a0a;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  padding: 4px 24px 16px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.55), 0 1px 0 rgba(255,255,255,0.04) inset;
+  box-sizing: border-box;
+  animation: ig-fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ig-crest {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  margin-bottom: 16px;
+}
+
+.ig-crest-wrap {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+/* Sign-up only: crop the logo's own top margin by shrinking this
+   wrapper and bottom-aligning the image inside it — the excess simply
+   overflows above the wrapper and is clipped there. The card itself
+   (.ig-box) is untouched, so its glow/shadow still render normally. */
+.ig-crest-wrap-cropped {
+  height: 185px;
+  overflow: hidden;
+  align-items: flex-end;
+}
+
+.ig-crest-standalone {
+  width: 220px;
+  height: 220px;
+  margin-bottom: 0;
+}
+
+.ig-tagline-overlay {
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  color: #fafafa;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 14px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.ig-form {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ig-field {
+  position: relative;
+}
+
+.ig-field input {
+  width: 100%;
+  height: 54px;
+  background: #1a1a1a;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  padding: 24px 12px 8px;
+  font-size: 14px;
+  line-height: 1.2;
+  color: #fafafa;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+}
+.ig-field input:hover { background: #202020; }
+.ig-field input:focus {
+  border-color: #0095f6;
+  background: #161616;
+  box-shadow: 0 0 0 3px rgba(0,149,246,0.15);
+}
+
+.ig-field label {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #8e8e8e;
+  font-size: 14px;
+  line-height: 1;
+  pointer-events: none;
+  transition: all 0.15s ease;
+}
+
+.ig-field input:focus ~ label,
+.ig-field input:not(:placeholder-shown) ~ label {
+  top: 8px;
+  transform: translateY(0);
+  font-size: 10px;
+  color: #6bb8f7;
+}
+
+/* Chrome/Edge/Safari force a white background + black text on
+   autofilled fields (e.g. a saved email), overriding our dark theme.
+   This neutralises it: the giant inset box-shadow paints over the
+   forced background, and -webkit-text-fill-color overrides the forced
+   text color (plain `color` alone can't win here). Also force the
+   label into its "shrunk" position on autofill, since some browsers
+   don't reliably flip :placeholder-shown when a value is autofilled
+   rather than typed — that mismatch is what caused the overlap. */
+.ig-field input:-webkit-autofill,
+.ig-field input:-webkit-autofill:hover,
+.ig-field input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #fafafa;
+  -webkit-box-shadow: 0 0 0 1000px #1a1a1a inset;
+  box-shadow: 0 0 0 1000px #1a1a1a inset;
+  transition: background-color 9999s ease-in-out 0s, box-shadow 9999s ease-in-out 0s;
+  caret-color: #fafafa;
+}
+
+.ig-field input:-webkit-autofill ~ label {
+  top: 8px;
+  transform: translateY(0);
+  font-size: 10px;
+  color: #6bb8f7;
+}
+
+.ig-submit-btn {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #0095f6;
+  border: none;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 11px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: background 0.15s, transform 0.08s, opacity 0.15s;
+}
+.ig-submit-btn:hover:not(:disabled) { background: #0077c2; }
+.ig-submit-btn:active:not(:disabled) { transform: scale(0.98); }
+.ig-submit-btn:disabled { background: #0095f6; cursor: default; }
+
+.ig-spinner {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.35);
+  border-top-color: #fff;
+  animation: ig-spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+.ig-divider {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  color: #8e8e8e;
+  font-size: 13px;
+  font-weight: 600;
+  margin: 22px 0;
+}
+.ig-divider::before, .ig-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255,255,255,0.1);
+}
+.ig-divider span { padding: 0 18px; }
+
+.ig-google-link {
+  position: relative;
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #e8e8e8;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  transition: color 0.15s, background 0.15s;
+}
+.ig-google-link:hover:not(:disabled) { color: #ffffff; background: rgba(255,255,255,0.06); }
+.ig-google-link:disabled { opacity: 0.5; cursor: default; }
+
+.ig-google-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 3px;
+  box-sizing: border-box;
+}
+
+.ig-forgot-link {
+  position: relative;
+  background: none;
+  border: none;
+  color: #6bb8f7;
+  font-size: 12.5px;
+  cursor: pointer;
+  margin-top: 18px;
+  padding: 4px;
+  transition: color 0.15s;
+}
+.ig-forgot-link:hover { color: #a8d4ff; text-decoration: underline; }
+
+.ig-message {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 12.5px;
+  text-align: center;
+  border-radius: 8px;
+  padding: 9px 12px;
+  margin-top: 14px;
+  box-sizing: border-box;
+  animation: ig-fade-up 0.25s ease-out;
+}
+.ig-message.error { background: rgba(237,73,86,0.12); color: #ff6b74; border: 1px solid rgba(237,73,86,0.25); }
+.ig-message.success { background: rgba(74,222,128,0.1); color: #4ade80; border: 1px solid rgba(74,222,128,0.25); }
+
+.ig-signup-box {
+  flex-shrink: 0;
+  border-top: 1px solid rgba(255,255,255,0.09);
+  background: #000000;
+  padding: 20px;
+  text-align: center;
+  font-size: 14px;
+  color: #a8a8a8;
+}
+
+.ig-signup-box button {
+  background: none;
+  border: none;
+  color: #0095f6;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.15s;
+}
+.ig-signup-box button:hover { color: #6bb8f7; }
+
+
+@media (prefers-reduced-motion: reduce) {
+  .ig-box, .ig-message, .ig-spinner {
+    animation: none !important;
+  }
+}
