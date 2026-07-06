@@ -40,7 +40,11 @@ body {
 }
 
 #root { height: 100vh; }
-.app { display: flex; height: 100vh; }
+/* Inherits #root's height (100vh, overridden to 100dvh on mobile below)
+   instead of hardcoding its own 100vh — otherwise this ignores that
+   override and the on-screen keyboard covers the input bar instead of
+   the layout shrinking to make room for it. */
+.app { display: flex; height: 100%; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
