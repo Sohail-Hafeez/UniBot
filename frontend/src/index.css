@@ -610,6 +610,11 @@ textarea::placeholder { color: var(--text-dim); }
    while streaming); turns accent-blue once there's text to send. The
    arrow itself stays white in both states. */
 .send-btn:not(:disabled) { background: var(--accent); }
+/* The arrow's white is identical to the mic icon's, but reads as
+   duller here — a saturated blue field makes the same white look
+   less vivid than the mic's neutral grey backdrop (simultaneous
+   contrast). A soft white glow compensates so it pops the same way. */
+.send-btn:not(:disabled) svg { filter: drop-shadow(0 0 2px rgba(255,255,255,0.7)); }
 .send-btn:hover:not(:disabled) {
   background: var(--accent-hover);
   transform: scale(1.05);
