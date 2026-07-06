@@ -15,7 +15,12 @@
   --danger: #ef4444;
 }
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+button, .session-item, .suggestion-card {
+  -webkit-user-select: none;
+  user-select: none;
+}
 
 @keyframes fade-in-up {
   from { opacity: 0; transform: translateY(8px); }

@@ -32,6 +32,13 @@ TTS_MODEL = "tts-1"
 # retry once forcing the Urdu language code.
 _DEVANAGARI_RANGE = ("ऀ", "ॿ")
 
+# On silent/near-silent audio, Whisper doesn't reliably return empty —
+# it often hallucinates generic filler text instead ("Thank you.",
+# "Thanks for watching!"). verbose_json exposes a per-segment
+# no_speech_prob confidence score; segments above this threshold are
+# dropped as noise rather than trusted as real transcribed speech.
+_NO_SPEECH_THRESHOLD = 0.6
+
 _client: Optional[AsyncOpenAI] = None
 
 
@@ -65,6 +72,19 @@ def _looks_like_devanagari(text: str) -> bool:
     return alpha > 0 and devanagari / alpha > 0.5
 
 
+def _filter_silence(result) -> str:
+    """Drop segments Whisper itself flags as more likely silence than
+    speech, instead of trusting whatever filler text it hallucinated
+    for them."""
+
+    segments = getattr(result, "segments", None)
+    if not segments:
+        return (result.text or "").strip()
+
+    kept = [s.text for s in segments if getattr(s, "no_speech_prob", 0) < _NO_SPEECH_THRESHOLD]
+    return "".join(kept).strip()
+
+
 async def transcribe(audio_bytes: bytes, filename: str = "audio.webm") -> str:
     """
     Transcribe recorded audio to text via Whisper.
@@ -87,17 +107,19 @@ async def transcribe(audio_bytes: bytes, filename: str = "audio.webm") -> str:
     buf = io.BytesIO(audio_bytes)
     buf.name = filename or "audio.webm"
 
-    result = await client.audio.transcriptions.create(model=TRANSCRIBE_MODEL, file=buf)
-    text = (result.text or "").strip()
+    result = await client.audio.transcriptions.create(
+        model=TRANSCRIBE_MODEL, file=buf, response_format="verbose_json"
+    )
+    text = _filter_silence(result)
 
     if _looks_like_devanagari(text):
         logger.info("Transcript looked like Devanagari — retrying forced to Urdu.")
         buf2 = io.BytesIO(audio_bytes)
         buf2.name = filename or "audio.webm"
         retry = await client.audio.transcriptions.create(
-            model=TRANSCRIBE_MODEL, file=buf2, language="ur"
+            model=TRANSCRIBE_MODEL, file=buf2, language="ur", response_format="verbose_json"
         )
-        text = (retry.text or "").strip()
+        text = _filter_silence(retry)
 
     return text
 
