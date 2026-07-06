@@ -54,18 +54,7 @@ export default function InputBar({ onSend, disabled, ttsEnabled, onToggleTTS }) 
           title={ttsEnabled ? 'Mute voice responses' : 'Enable voice responses'}
           type="button"
         >
-          {ttsEnabled ? (
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M3 10v4h4l5 5V5L7 10H3z" />
-              <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v8.06c1.48-.74 2.5-2.26 2.5-4.03z" />
-              <path d="M14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
-            </svg>
-          ) : (
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M3 10v4h4l5 5V5L7 10H3z" />
-              <path d="M19 6.41 17.59 5 15 7.59 12.41 5 11 6.41 13.59 9 11 11.59 12.41 13 15 10.41 17.59 13 19 11.59 16.41 9z" />
-            </svg>
-          )}
+          {ttsEnabled ? '🔊' : '🔇'}
         </button>
         <button className="send-btn" onClick={submit} disabled={disabled || !text.trim()}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">

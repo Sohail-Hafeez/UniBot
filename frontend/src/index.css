@@ -621,17 +621,15 @@ textarea::placeholder { color: var(--text-dim); }
 }
 .send-btn:disabled { cursor: not-allowed; opacity: 0.6; }
 
-/* Voice + TTS buttons — all three input-bar buttons (this pair plus
-   .send-btn) share the same circle size/background/border so they
-   read as one consistent row instead of one being a raw emoji. */
+/* Voice + TTS buttons */
 .voice-btn, .tts-btn {
-  border: 1px solid var(--border);
-  border-radius: 50%;
-  background: var(--input-bg);
-  color: white;
+  background: none;
+  border: none;
+  color: var(--text-muted);
   cursor: pointer;
   font-size: 18px;
   padding: 5px;
+  border-radius: 8px;
   flex-shrink: 0;
   transition: color 0.15s, background 0.15s;
   line-height: 1;
@@ -641,9 +639,17 @@ textarea::placeholder { color: var(--text-dim); }
   width: 34px;
   height: 34px;
 }
-.tts-btn:hover { color: white; background: var(--hover-strong); }
+.tts-btn:hover { color: var(--text); background: var(--hover-strong); }
 .tts-btn.active { color: var(--accent); }
 
+/* Voice button keeps the filled-circle treatment (that one was asked
+   for); .tts-btn above stays as the original flat/transparent style. */
+.voice-btn {
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--input-bg);
+  color: white;
+}
 .voice-btn:hover:not(:disabled) { color: white; background: var(--hover-strong); }
 .voice-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 .voice-btn.recording { color: var(--danger); background: rgba(239,68,68,0.15); animation: pulse 1s ease-in-out infinite; }
