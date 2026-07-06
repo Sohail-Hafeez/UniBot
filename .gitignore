@@ -2,6 +2,7 @@
 .env
 .env.*
 *firebase-adminsdk*.json
+a.txt
 
 # Python
 venv/

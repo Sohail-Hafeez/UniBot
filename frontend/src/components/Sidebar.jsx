@@ -38,6 +38,8 @@ export default function Sidebar({
   user,
   onSignOut,
   onSetPassword,
+  isOpen,
+  onClose,
 }) {
   const [confirmingSignOut, setConfirmingSignOut] = useState(false)
   const displayName = user?.displayName || user?.email || 'Account'
@@ -46,17 +48,24 @@ export default function Sidebar({
   const groups = groupSessionsByDate(sessions)
 
   return (
-    <div className="sidebar">
+    <div className={`sidebar ${isOpen ? 'open' : ''}`}>
       <div className="sidebar-header">
         <div className="sidebar-logo">
           <img src={nustLogo} alt="NUST" className="logo-icon" />
           <span className="logo-name">UniBot</span>
         </div>
-        <button className="new-chat-icon-btn" onClick={onNewChat} title="New chat">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 5v14M5 12h14" />
-          </svg>
-        </button>
+        <div className="sidebar-header-actions">
+          <button className="new-chat-icon-btn" onClick={onNewChat} title="New chat">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+          </button>
+          <button className="sidebar-close-btn" onClick={onClose} title="Close menu">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       <div className="sidebar-body">

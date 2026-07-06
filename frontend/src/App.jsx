@@ -35,6 +35,7 @@ export default function App() {
   const [isStreaming, setIsStreaming] = useState(false)
   const [ttsEnabled, setTtsEnabled] = useState(false)
   const [apiError, setApiError] = useState('')
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const tts = useTTS()
 
   useEffect(() => {
@@ -210,17 +211,28 @@ export default function App() {
 
   return (
     <div className="app">
+      {sidebarOpen && <div className="sidebar-backdrop" onClick={() => setSidebarOpen(false)} />}
       <Sidebar
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
         sessions={sessions}
         activeSessionId={activeSessionId}
-        onNewChat={startNewChat}
-        onSelectSession={loadSession}
+        onNewChat={() => { startNewChat(); setSidebarOpen(false) }}
+        onSelectSession={(id) => { loadSession(id); setSidebarOpen(false) }}
         onDeleteSession={deleteSession}
         user={user}
         onSignOut={() => signOut(auth)}
         onSetPassword={() => setShowSetPassword(true)}
       />
       <div className="main">
+        <div className="mobile-topbar">
+          <button className="mobile-menu-btn" onClick={() => setSidebarOpen(true)} title="Menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 12h18M3 6h18M3 18h18" />
+            </svg>
+          </button>
+          <span className="mobile-topbar-title">UniBot</span>
+        </div>
         {apiError && (
           <div className="api-error-banner">
             {apiError}
