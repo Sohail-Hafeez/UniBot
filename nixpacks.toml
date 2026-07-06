@@ -1,0 +1,12 @@
+# Railway (Nixpacks) build config for the FastAPI backend.
+#
+# The repo root also has a requirements.txt for the data-ingestion
+# pipeline (crawler/chunker/embeddings scripts) — that's NOT what the
+# deployed web service needs, so the install step here points at
+# backend/requirements.txt explicitly instead of relying on Nixpacks'
+# default "install whatever requirements.txt it finds at the root".
+[phases.install]
+cmds = ["pip install -r backend/requirements.txt"]
+
+[start]
+cmd = "cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT"

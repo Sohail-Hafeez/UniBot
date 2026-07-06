@@ -166,7 +166,7 @@ A short, honest list of the real bumps hit along the way:
 | **PostgreSQL (via Neon)** | Stores every user's chat sessions and messages reliably in the cloud | Doesn't disappear when the app restarts or redeploys, unlike a local file |
 | **Firebase Authentication** | Handles user sign-up and login (Google sign-in and email/password) | Trusted, well-tested, and free at this scale |
 | **React + Vite** | Builds the actual website/chat interface the student sees and clicks around in | Modern, fast, and great for a smooth, app-like feel |
-| **Vercel / Render / Neon / Qdrant Cloud** | Where the finished project is hosted, all on free tiers | Zero ongoing cost at this project's scale |
+| **Vercel / Railway / Neon / Qdrant Cloud** | Where the finished project is hosted, all on free tiers | Zero ongoing cost at this project's scale |
 
 ---
 
@@ -307,11 +307,11 @@ The frontend also needs its own `.env` file inside `frontend/` with your `VITE_F
 The whole project is designed to run on free hosting, forever, at this project's scale (around 100 users):
 
 - **Frontend** → **Vercel** (free)
-- **Backend** → **Render** (free web service — the only cost is that it "falls asleep" after 15 minutes of no traffic, and takes up to a minute to wake back up for the next visitor)
+- **Backend** → **Railway** (free trial credit, no card required to start; originally planned for Render, but Render started requiring a card to deploy even on its free tier)
 - **Chat history database** → **Neon** (free Postgres database, more than enough storage and speed for this many users)
 - **Knowledge base** → **Qdrant Cloud** (already in use, free tier)
 
-No credit card is required anywhere in this exact setup, and there is no ongoing cost as long as usage stays within these free tiers (which it comfortably will, at this scale).
+Railway build/start config lives in `nixpacks.toml` at the repo root — it installs `backend/requirements.txt` (not the root `requirements.txt`, which is for the ingestion pipeline only) and runs `uvicorn` bound to Railway's `$PORT`. The frontend needs `VITE_API_URL` set to the deployed Railway backend URL once it's live (frontend and backend are on different domains, so relative `/api/...` calls need an absolute base outside of local dev).
 
 ---
 
