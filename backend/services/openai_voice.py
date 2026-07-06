@@ -32,13 +32,6 @@ TTS_MODEL = "tts-1"
 # retry once forcing the Urdu language code.
 _DEVANAGARI_RANGE = ("ऀ", "ॿ")
 
-# On silent/near-silent audio, Whisper doesn't reliably return empty —
-# it often hallucinates generic filler text instead ("Thank you.",
-# "Thanks for watching!"). verbose_json exposes a per-segment
-# no_speech_prob confidence score; segments above this threshold are
-# dropped as noise rather than trusted as real transcribed speech.
-_NO_SPEECH_THRESHOLD = 0.6
-
 _client: Optional[AsyncOpenAI] = None
 
 
@@ -72,24 +65,11 @@ def _looks_like_devanagari(text: str) -> bool:
     return alpha > 0 and devanagari / alpha > 0.5
 
 
-def _filter_silence(result) -> str:
-    """Drop segments Whisper itself flags as more likely silence than
-    speech, instead of trusting whatever filler text it hallucinated
-    for them."""
-
-    segments = getattr(result, "segments", None)
-    if not segments:
-        return (result.text or "").strip()
-
-    kept = [s.text for s in segments if getattr(s, "no_speech_prob", 0) < _NO_SPEECH_THRESHOLD]
-    return "".join(kept).strip()
-
-
 # A handful of stock closing lines (from YouTube-style training data)
-# that Whisper hallucinates on silence with HIGH confidence — its own
-# no_speech_prob doesn't catch these because the model isn't actually
-# unsure, it's just wrong. Caught here as an exact-match net after the
-# confidence-based filter above.
+# that Whisper hallucinates on genuinely silent audio. The frontend
+# already skips sending near-silent recordings at all (RMS volume
+# check), so this is just a safety net for whatever slips through —
+# e.g. faint background noise that wasn't quite silent.
 _HALLUCINATION_PHRASES = {
     "thank you",
     "thanks for watching",
@@ -133,19 +113,17 @@ async def transcribe(audio_bytes: bytes, filename: str = "audio.webm") -> str:
     buf = io.BytesIO(audio_bytes)
     buf.name = filename or "audio.webm"
 
-    result = await client.audio.transcriptions.create(
-        model=TRANSCRIBE_MODEL, file=buf, response_format="verbose_json"
-    )
-    text = _strip_hallucination(_filter_silence(result))
+    result = await client.audio.transcriptions.create(model=TRANSCRIBE_MODEL, file=buf)
+    text = _strip_hallucination((result.text or "").strip())
 
     if _looks_like_devanagari(text):
         logger.info("Transcript looked like Devanagari — retrying forced to Urdu.")
         buf2 = io.BytesIO(audio_bytes)
         buf2.name = filename or "audio.webm"
         retry = await client.audio.transcriptions.create(
-            model=TRANSCRIBE_MODEL, file=buf2, language="ur", response_format="verbose_json"
+            model=TRANSCRIBE_MODEL, file=buf2, language="ur"
         )
-        text = _strip_hallucination(_filter_silence(retry))
+        text = _strip_hallucination((retry.text or "").strip())
 
     return text
 

@@ -1,17 +1,58 @@
 import { useState, useRef } from 'react'
 import { authFetch } from '../authFetch'
 
+// RMS volume (0-1 scale) below this across the whole recording is
+// treated as silence. Skips sending it to Whisper entirely — a silent
+// clip either transcribes to nothing or (worse) a hallucinated stock
+// phrase, and the round-trip itself is pure wasted latency either way.
+const SILENCE_THRESHOLD = 0.02
+
 export default function VoiceButton({ onTranscript, disabled }) {
   const [recording, setRecording] = useState(false)
   const [loading, setLoading] = useState(false)
   const recorderRef = useRef(null)
   const chunksRef = useRef([])
   const startTimeRef = useRef(null)
+  const audioCtxRef = useRef(null)
+  const maxVolumeRef = useRef(0)
+  const volumeRafRef = useRef(null)
+
+  function startVolumeMonitor(stream) {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext
+    const audioCtx = new AudioCtx()
+    const source = audioCtx.createMediaStreamSource(stream)
+    const analyser = audioCtx.createAnalyser()
+    analyser.fftSize = 512
+    source.connect(analyser)
+    audioCtxRef.current = audioCtx
+    maxVolumeRef.current = 0
+
+    const data = new Uint8Array(analyser.frequencyBinCount)
+    const tick = () => {
+      analyser.getByteTimeDomainData(data)
+      let sumSquares = 0
+      for (let i = 0; i < data.length; i++) {
+        const normalised = (data[i] - 128) / 128
+        sumSquares += normalised * normalised
+      }
+      const rms = Math.sqrt(sumSquares / data.length)
+      if (rms > maxVolumeRef.current) maxVolumeRef.current = rms
+      volumeRafRef.current = requestAnimationFrame(tick)
+    }
+    tick()
+  }
+
+  function stopVolumeMonitor() {
+    if (volumeRafRef.current) cancelAnimationFrame(volumeRafRef.current)
+    audioCtxRef.current?.close()
+    audioCtxRef.current = null
+  }
 
   async function startRecording() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
       chunksRef.current = []
+      startVolumeMonitor(stream)
 
       const recorder = new MediaRecorder(stream)
       recorderRef.current = recorder
@@ -22,9 +63,10 @@ export default function VoiceButton({ onTranscript, disabled }) {
 
       recorder.onstop = async () => {
         stream.getTracks().forEach((t) => t.stop())
+        stopVolumeMonitor()
 
-        if (chunksRef.current.length === 0) {
-          console.warn('No audio chunks captured')
+        if (chunksRef.current.length === 0 || maxVolumeRef.current < SILENCE_THRESHOLD) {
+          console.warn('No audio chunks captured, or recording was silent')
           return
         }
 
