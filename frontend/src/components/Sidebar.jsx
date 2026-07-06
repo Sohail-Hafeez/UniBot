@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import nustLogo from '../assets/nust-logo.png'
 
 function groupSessionsByDate(sessions) {
@@ -113,7 +114,14 @@ export default function Sidebar({
                 🔑
               </button>
             )}
-            <button className="sign-out-btn" onClick={() => setConfirmingSignOut(true)} title="Sign out">
+            <button
+              className="sign-out-btn"
+              onClick={() => {
+                setConfirmingSignOut(true)
+                onClose?.()
+              }}
+              title="Sign out"
+            >
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                 <path d="M16 17l5-5-5-5" />
@@ -124,7 +132,13 @@ export default function Sidebar({
         </div>
       )}
 
-      {confirmingSignOut && (
+      {confirmingSignOut && createPortal(
+        // Rendered into document.body, not here — a position:fixed
+        // element nested inside .sidebar would be confined to the
+        // sidebar's own box once .sidebar gets a transform (for the
+        // mobile slide-in/out drawer), since a transformed ancestor
+        // becomes the containing block for fixed descendants. A portal
+        // sidesteps that entirely.
         <div className="modal-overlay" onClick={() => setConfirmingSignOut(false)}>
           <div className="modal-card" onClick={(e) => e.stopPropagation()}>
             <div className="modal-title">Sign out?</div>
@@ -142,7 +156,8 @@ export default function Sidebar({
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   )

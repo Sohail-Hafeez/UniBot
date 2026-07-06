@@ -592,8 +592,8 @@ textarea {
 textarea::placeholder { color: var(--text-dim); }
 
 .send-btn {
-  background: var(--accent);
-  border: none;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
   border-radius: 50%;
   color: white;
   cursor: pointer;
@@ -607,10 +607,10 @@ textarea::placeholder { color: var(--text-dim); }
   transition: background 0.15s, transform 0.1s;
 }
 .send-btn:hover:not(:disabled) {
-  background: var(--accent-hover);
+  background: var(--hover-strong);
   transform: scale(1.05);
 }
-.send-btn:disabled { background: #454550; cursor: not-allowed; color: var(--text-dim); }
+.send-btn:disabled { background: #454550; cursor: not-allowed; color: var(--text-dim); opacity: 0.6; }
 
 /* Voice + TTS buttons */
 .voice-btn, .tts-btn {
@@ -633,14 +633,16 @@ textarea::placeholder { color: var(--text-dim); }
 .tts-btn:hover { color: var(--text); background: var(--hover-strong); }
 .tts-btn.active { color: var(--accent); }
 
-/* Voice button: always a filled circle (not just on hover) so it reads
-   as a proper button chip instead of a flat, easy-to-miss glyph. */
+/* Voice button: always a filled circle (not just on hover), matching
+   the send button's size/background/border exactly so the two sit as
+   equal circles side by side. */
 .voice-btn {
+  border: 1px solid var(--border);
   border-radius: 50%;
   background: var(--input-bg);
-  color: var(--text);
+  color: white;
 }
-.voice-btn:hover:not(:disabled) { color: var(--text); background: var(--hover-strong); }
+.voice-btn:hover:not(:disabled) { color: white; background: var(--hover-strong); }
 .voice-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 .voice-btn.recording { color: var(--danger); background: rgba(239,68,68,0.15); animation: pulse 1s ease-in-out infinite; }
 .voice-btn.loading { color: var(--accent); cursor: wait; }
