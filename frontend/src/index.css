@@ -636,6 +636,16 @@ textarea::placeholder { color: var(--text-dim); }
 .voice-btn.loading { color: var(--text-muted); cursor: wait; }
 .tts-btn.active { color: var(--accent); }
 
+.voice-spinner {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.2);
+  border-top-color: currentColor;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
 @keyframes pulse {
   0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(239,68,68,0.3); }
   50%       { opacity: 0.75; box-shadow: 0 0 0 6px rgba(239,68,68,0); }
