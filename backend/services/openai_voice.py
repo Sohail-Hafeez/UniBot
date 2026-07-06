@@ -85,6 +85,32 @@ def _filter_silence(result) -> str:
     return "".join(kept).strip()
 
 
+# A handful of stock closing lines (from YouTube-style training data)
+# that Whisper hallucinates on silence with HIGH confidence — its own
+# no_speech_prob doesn't catch these because the model isn't actually
+# unsure, it's just wrong. Caught here as an exact-match net after the
+# confidence-based filter above.
+_HALLUCINATION_PHRASES = {
+    "thank you",
+    "thanks for watching",
+    "thank you for watching",
+    "please subscribe",
+    "subscribe",
+    "like and subscribe",
+    "bye",
+    "bye bye",
+    "see you next time",
+    "i'll see you next time",
+    "okay thank you",
+    "you",
+}
+
+
+def _strip_hallucination(text: str) -> str:
+    normalised = text.strip().strip(".!,،؟").lower()
+    return "" if normalised in _HALLUCINATION_PHRASES else text
+
+
 async def transcribe(audio_bytes: bytes, filename: str = "audio.webm") -> str:
     """
     Transcribe recorded audio to text via Whisper.
@@ -110,7 +136,7 @@ async def transcribe(audio_bytes: bytes, filename: str = "audio.webm") -> str:
     result = await client.audio.transcriptions.create(
         model=TRANSCRIBE_MODEL, file=buf, response_format="verbose_json"
     )
-    text = _filter_silence(result)
+    text = _strip_hallucination(_filter_silence(result))
 
     if _looks_like_devanagari(text):
         logger.info("Transcript looked like Devanagari — retrying forced to Urdu.")
@@ -119,7 +145,7 @@ async def transcribe(audio_bytes: bytes, filename: str = "audio.webm") -> str:
         retry = await client.audio.transcriptions.create(
             model=TRANSCRIBE_MODEL, file=buf2, language="ur", response_format="verbose_json"
         )
-        text = _filter_silence(retry)
+        text = _strip_hallucination(_filter_silence(retry))
 
     return text
 
