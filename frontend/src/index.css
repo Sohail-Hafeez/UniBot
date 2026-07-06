@@ -649,7 +649,7 @@ textarea::placeholder { color: var(--text-dim); }
 .voice-btn:hover:not(:disabled) { color: white; background: var(--hover-strong); }
 .voice-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 .voice-btn.recording { color: var(--danger); background: rgba(239,68,68,0.15); animation: pulse 1s ease-in-out infinite; }
-.voice-btn.loading { color: var(--accent); cursor: wait; }
+.voice-btn.loading { color: var(--accent); cursor: wait; opacity: 1; }
 
 .voice-spinner {
   width: 14px;
