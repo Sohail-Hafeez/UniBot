@@ -642,14 +642,9 @@ textarea::placeholder { color: var(--text-dim); }
 .tts-btn:hover { color: var(--text); background: var(--hover-strong); }
 .tts-btn.active { color: var(--accent); }
 
-/* Voice button keeps the filled-circle treatment (that one was asked
-   for); .tts-btn above stays as the original flat/transparent style. */
-.voice-btn {
-  border: 1px solid var(--border);
-  border-radius: 50%;
-  background: var(--input-bg);
-  color: white;
-}
+/* Voice button: plain icon like the TTS button (no circle/background
+   at rest), just kept bright white instead of the muted default. */
+.voice-btn { color: white; }
 .voice-btn:hover:not(:disabled) { color: white; background: var(--hover-strong); }
 .voice-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 .voice-btn.recording { color: var(--danger); background: rgba(239,68,68,0.15); animation: pulse 1s ease-in-out infinite; }

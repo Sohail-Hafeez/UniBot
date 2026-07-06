@@ -56,12 +56,12 @@ export default function InputBar({ onSend, disabled, ttsEnabled, onToggleTTS }) 
         >
           {ttsEnabled ? '🔊' : '🔇'}
         </button>
+        <VoiceButton onTranscript={handleTranscript} disabled={disabled} />
         <button className="send-btn" onClick={submit} disabled={disabled || !text.trim()}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 4l-8 8h5v8h6v-8h5z" />
           </svg>
         </button>
-        <VoiceButton onTranscript={handleTranscript} disabled={disabled} />
       </div>
     </div>
   )
