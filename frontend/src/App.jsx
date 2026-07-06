@@ -45,6 +45,7 @@ export default function App() {
       setSessions([])
       setActiveSessionId(null)
       setMessages([])
+      setSidebarOpen(false)
 
       if (nextUser?.emailVerified) {
         // A restored session can have emailVerified:true at the profile

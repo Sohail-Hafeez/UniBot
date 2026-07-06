@@ -131,7 +131,15 @@ export default function Sidebar({
             <p className="modal-text">You'll need to sign in again to see your conversations.</p>
             <div className="modal-actions">
               <button className="modal-btn-secondary" onClick={() => setConfirmingSignOut(false)}>Cancel</button>
-              <button className="modal-btn modal-btn-danger" onClick={onSignOut}>Sign Out</button>
+              <button
+                className="modal-btn modal-btn-danger"
+                onClick={() => {
+                  setConfirmingSignOut(false)
+                  onSignOut()
+                }}
+              >
+                Sign Out
+              </button>
             </div>
           </div>
         </div>
