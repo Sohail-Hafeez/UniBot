@@ -606,11 +606,15 @@ textarea::placeholder { color: var(--text-dim); }
   flex-shrink: 0;
   transition: background 0.15s, transform 0.1s;
 }
+/* Matches the mic button's grey circle at rest (empty input / disabled
+   while streaming); turns accent-blue once there's text to send. The
+   arrow itself stays white in both states. */
+.send-btn:not(:disabled) { background: var(--accent); }
 .send-btn:hover:not(:disabled) {
-  background: var(--hover-strong);
+  background: var(--accent-hover);
   transform: scale(1.05);
 }
-.send-btn:disabled { background: #454550; cursor: not-allowed; color: var(--text-dim); opacity: 0.6; }
+.send-btn:disabled { cursor: not-allowed; opacity: 0.6; }
 
 /* Voice + TTS buttons */
 .voice-btn, .tts-btn {
